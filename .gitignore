@@ -1,0 +1,34 @@
+# Dependencias
+/node_modules
+node_modules/
+# Producción
+/.next/
+/out/
+
+# Archivos generados
+*.log
+*.cache
+*.DS_Store
+
+# Archivos de entorno
+.env.local
+.env.development.local
+.env.test.local
+.env.production.local
+
+# Archivos específicos de Next.js
+.next
+out
+
+# Ignorar archivos de configuración de IDE/editor
+/.vscode
+/.idea
+*.swp
+*.swo
+
+# Archivos de reporte de cobertura
+/coverage
+
+# Archivos de configuración de yarn si se usa
+.yarn
+.pnp.*

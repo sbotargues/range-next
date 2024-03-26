@@ -1,67 +1,80 @@
-import React, { useState, useEffect } from "react";
-import { useRouter } from "next/router";
-import Range from "../components/RangeComponent";
-import Chip from "../components/ChipComponent";
-import getFixedRange from "../services/getFixedRange";
+import React, { Component } from "react";
+import Link from "next/link";
+import { Range } from "../components/Range";
+import { ApiService } from "../api/api";
 
-interface Value {
+interface RangeData {
+  id: string;
   min: number;
   max: number;
+  rangeValues: number[] | undefined;
 }
 
-const Exercise2: React.FC = () => {
-  const [min, setMin] = useState<number>(0);
-  const [max, setMax] = useState<number>(0);
-  const [step, setStep] = useState<number>(0);
-  const [value, setValue] = useState<Value>({ min, max });
-  const [range, setRange] = useState<number[]>([]);
-  const router = useRouter();
+interface Exercise2State {
+  data: RangeData[];
+}
 
-  useEffect(() => {
-    (async () => {
-      const data = await getFixedRange();
-      if (data instanceof Error) {
-        console.error(data.message);
-        return;
-      }
+export default class Exercise2 extends Component<{}, Exercise2State> {
+  constructor(props: {}) {
+    super(props);
+    this.state = {
+      data: [],
+    };
+  }
 
-      const sortedRange = data.valueRanges.sort((a, b) => a - b);
-      setMin(sortedRange[0]);
-      setMax(sortedRange[sortedRange.length - 1]);
-      setStep(1);
-      setRange(sortedRange);
-      setValue({
-        min: sortedRange[0],
-        max: sortedRange[sortedRange.length - 1],
-      });
-    })();
-  }, []);
+  componentDidMount() {
+    this.fetchData();
+  }
 
-  const handleGoToNextExercise = (e: React.MouseEvent<HTMLButtonElement>) => {
-    e.preventDefault();
-    router.push("/exercise1");
+  onChangeMin = (value: number, id: string) => {
+    const store = [...this.state.data];
+    const index = store.findIndex((range) => range.id === id);
+    store[index].min = value;
+    this.setState({
+      data: store,
+    });
   };
 
-  return (
-    <div className="p-4">
-      <Range
-        min={min}
-        max={max}
-        step={step}
-        value={value}
-        range={range}
-        onChangeValue={setValue}
-      />
-      <Chip head="Min" content={`The minimum value is: ${value.min}€`} />
-      <Chip head="Max" content={`The maximum value is: ${value.max}€`} />
-      <button
-        onClick={handleGoToNextExercise}
-        className="mt-4 bg-blue-500 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded"
-      >
-        Go to Exercise 1
-      </button>
-    </div>
-  );
-};
+  onChangeMax = (value: number, id: string) => {
+    const store = [...this.state.data];
+    const index = store.findIndex((range) => range.id === id);
+    store[index].max = value;
+    this.setState({
+      data: store,
+    });
+  };
 
-export default Exercise2;
+  async fetchData() {
+    const data = await ApiService.getAllFixedRanges();
+    this.setState({ data });
+  }
+
+  render() {
+    const { data } = this.state;
+    return (
+      <div className="flex flex-col items-center my-8">
+        <div className="mb-8">
+          <Link href="/">
+            <span className="text-blue-600 hover:text-blue-800 transition duration-300 ease-in-out cursor-pointer">
+              Back to Home
+            </span>
+          </Link>
+        </div>
+        <ul className="list-ranges space-y-4 max-w-4xl w-full">
+          {data.map((range) => (
+            <li key={range.id} className="bg-white shadow-md rounded-lg p-4">
+              <Range
+                id={range.id}
+                min={range.min}
+                max={range.max}
+                rangeValues={range.rangeValues}
+                onChangeMin={this.onChangeMin}
+                onChangeMax={this.onChangeMax}
+              />
+            </li>
+          ))}
+        </ul>
+      </div>
+    );
+  }
+}

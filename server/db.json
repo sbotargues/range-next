@@ -1,0 +1,11 @@
+{
+  "ranges": [{ "id": 1, "minLimit": 0, "maxLimit": 100, "min": 20, "max": 50 }],
+  "fixedRanges": [
+    {
+      "id": 1,
+      "min": 5.99,
+      "max": 70.99,
+      "rangeValues": [1.99, 5.99, 10.99, 30.99, 50.99, 70.99]
+    }
+  ]
+}

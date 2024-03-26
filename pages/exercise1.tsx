@@ -1,61 +1,62 @@
 import React, { useState, useEffect } from "react";
-import { useRouter } from "next/router";
-import Range from "../components/RangeComponent";
-import Chip from "../components/ChipComponent";
-import getNormalRange from "../services/getNormalRange";
+import { Range } from "../components/Range";
+import { ApiService } from "../api/api";
+import Link from "next/link";
 
-interface Value {
-  min: number;
-  max: number;
-}
-
-const Exercise1: React.FC = () => {
-  const [min, setMin] = useState<number>(0);
-  const [max, setMax] = useState<number>(0);
-  const [step, setStep] = useState<number>(100);
-  const [value, setValue] = useState<Value>({ min, max });
-  const [range, setRange] = useState<number[]>([]);
-  const router = useRouter();
+const Exercise1 = () => {
+  const [data, setData] = useState([]);
 
   useEffect(() => {
-    (async () => {
-      const result = await getNormalRange();
-      if (result instanceof Error) {
-        console.error(result.message);
-        return;
-      }
-
-      const { min, max, step } = result;
-      setMin(min ?? 0);
-      setMax(max ?? 0);
-      setStep(step ?? 100);
-      setValue({ min: min ?? 0, max: max ?? 0 });
-    })();
+    fetchData();
   }, []);
 
-  const handleGoToNextExercise = (e: React.MouseEvent<HTMLButtonElement>) => {
-    e.preventDefault();
-    router.push("/exercise2");
+  const onChangeMin = (value, id) => {
+    const store = [...data];
+    const index = store.findIndex((range) => range.id === id);
+    store[index].min = value;
+    setData(store);
+  };
+
+  const onChangeMax = (value, id) => {
+    const store = [...data];
+    const index = store.findIndex((range) => range.id === id);
+    store[index].max = value;
+    setData(store);
+  };
+
+  const fetchData = async () => {
+    const fetchedData = await ApiService.getAllRanges();
+    setData(fetchedData);
+  };
+
+  const findById = (id) => {
+    return data.find((range) => range.id === id);
   };
 
   return (
-    <div className="p-4">
-      <Range
-        min={min}
-        max={max}
-        step={step}
-        value={value}
-        range={range}
-        onChangeValue={setValue}
-      />
-      <Chip head="Min" content={`The minimum value is: ${value.min}€`} />
-      <Chip head="Max" content={`The maximum value is: ${value.max}€`} />
-      <button
-        onClick={handleGoToNextExercise}
-        className="mt-4 bg-blue-500 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded"
-      >
-        Go to Exercise 2
-      </button>
+    <div className="flex flex-col items-center my-8">
+      <div className="mb-8">
+        <Link href="/">
+          <span className="text-blue-600 hover:text-blue-800 transition duration-300 ease-in-out cursor-pointer">
+            Back to Home
+          </span>
+        </Link>
+      </div>
+      <ul className="list-ranges space-y-4 max-w-4xl w-full">
+        {data.map((range) => (
+          <li key={range.id} className="bg-white shadow-md rounded-lg p-4">
+            <Range
+              id={range.id}
+              minLimit={range.minLimit}
+              maxLimit={range.maxLimit}
+              min={range.min}
+              max={range.max}
+              onChangeMin={onChangeMin}
+              onChangeMax={onChangeMax}
+            />
+          </li>
+        ))}
+      </ul>
     </div>
   );
 };

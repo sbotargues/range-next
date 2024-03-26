@@ -1,6 +1,6 @@
-import React, { Component } from "react";
+import React, { useState, useEffect } from "react";
 import Link from "next/link";
-import { Range } from "../components/Range";
+import Range from "../components/Range";
 import { ApiService } from "../api/api";
 
 interface RangeData {
@@ -10,71 +10,57 @@ interface RangeData {
   rangeValues: number[] | undefined;
 }
 
-interface Exercise2State {
-  data: RangeData[];
-}
+const Exercise2 = () => {
+  const [data, setData] = useState<RangeData[]>([]);
 
-export default class Exercise2 extends Component<{}, Exercise2State> {
-  constructor(props: {}) {
-    super(props);
-    this.state = {
-      data: [],
-    };
-  }
+  useEffect(() => {
+    fetchData();
+  }, []);
 
-  componentDidMount() {
-    this.fetchData();
-  }
-
-  onChangeMin = (value: number, id: string) => {
-    const store = [...this.state.data];
+  const onChangeMin = (value: number, id: string) => {
+    const store = [...data];
     const index = store.findIndex((range) => range.id === id);
     store[index].min = value;
-    this.setState({
-      data: store,
-    });
+    setData(store);
   };
 
-  onChangeMax = (value: number, id: string) => {
-    const store = [...this.state.data];
+  const onChangeMax = (value: number, id: string) => {
+    const store = [...data];
     const index = store.findIndex((range) => range.id === id);
     store[index].max = value;
-    this.setState({
-      data: store,
-    });
+    setData(store);
   };
 
-  async fetchData() {
-    const data = await ApiService.getAllFixedRanges();
-    this.setState({ data });
-  }
+  const fetchData = async () => {
+    const fetchedData = await ApiService.getAllFixedRanges();
+    setData(fetchedData);
+  };
 
-  render() {
-    const { data } = this.state;
-    return (
-      <div className="flex flex-col items-center my-8">
-        <div className="mb-8">
-          <Link href="/">
-            <span className="text-blue-600 hover:text-blue-800 transition duration-300 ease-in-out cursor-pointer">
-              Back to Home
-            </span>
-          </Link>
-        </div>
-        <ul className="list-ranges space-y-4 max-w-4xl w-full">
-          {data.map((range) => (
-            <li key={range.id} className="bg-white shadow-md rounded-lg p-4">
-              <Range
-                id={range.id}
-                min={range.min}
-                max={range.max}
-                rangeValues={range.rangeValues}
-                onChangeMin={this.onChangeMin}
-                onChangeMax={this.onChangeMax}
-              />
-            </li>
-          ))}
-        </ul>
+  return (
+    <div className="flex flex-col items-center my-8">
+      <div className="mb-8">
+        <Link href="/">
+          <span className="text-blue-600 hover:text-blue-800 transition duration-300 ease-in-out cursor-pointer">
+            Back to Home
+          </span>
+        </Link>
       </div>
-    );
-  }
-}
+      <ul className="list-ranges space-y-4 max-w-4xl w-full">
+        {data.map((range) => (
+          <li key={range.id} className="bg-white shadow-md rounded-lg p-4">
+            <Range
+              id={range.id}
+              min={range.min}
+              max={range.max}
+              rangeValues={range.rangeValues}
+              onChangeMin={onChangeMin}
+              onChangeMax={onChangeMax}
+            />
+          </li>
+        ))}
+      </ul>
+    </div>
+  );
+};
+
+export default Exercise2;

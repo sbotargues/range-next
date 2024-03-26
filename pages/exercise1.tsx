@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from "react";
-import { Range } from "../components/Range";
+import Range from "../components/Range";
 import { ApiService } from "../api/api";
 import Link from "next/link";
 
@@ -27,10 +27,6 @@ const Exercise1 = () => {
   const fetchData = async () => {
     const fetchedData = await ApiService.getAllRanges();
     setData(fetchedData);
-  };
-
-  const findById = (id) => {
-    return data.find((range) => range.id === id);
   };
 
   return (

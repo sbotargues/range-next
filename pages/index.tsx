@@ -1,4 +1,3 @@
-// pages/index.tsx
 import Link from "next/link";
 
 const HomePage = () => {

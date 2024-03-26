@@ -63,27 +63,39 @@ export class Range extends Component<RangeProps, RangeState> {
   }
 
   resizeObserverFixed() {
-    const steps = this.props.rangeValues!.length - 1;
+    const steps = this.props.rangeValues.length - 1;
     this.widthStep = this.width / steps;
+    const minIndex = this.props.rangeValues.findIndex(
+      (value) => value === this.props.min
+    );
+
     const stepsPosition = [];
-    this.props.rangeValues!.forEach((value, i) => {
+    this.props.rangeValues.forEach((value, i) => {
       const position = i * this.widthStep;
       let max = position + this.widthStep / 2;
       let min = position - this.widthStep / 2;
       min = min < 0 ? 0 : min;
       max = max > this.width ? this.width : max;
-      stepsPosition.push({ value, position, min, max });
+      stepsPosition.push({ position, min, max });
     });
-    const positionsMin = stepsPosition.map((pos) => ({
-      value: pos.value,
+
+    const positionsMin = stepsPosition.map((pos, i) => ({
+      value: this.props.rangeValues[i],
       ...pos,
     }));
-    const positionsMax = stepsPosition.reverse().map((pos) => ({
-      value: pos.value,
+
+    const positionsMax = stepsPosition.reverse().map((pos, i) => ({
+      value: this.props.rangeValues[i],
       ...pos,
     }));
-    this.setState({ positionsMin, positionsMax });
-    this.calculatePositionPullet();
+
+    this.setState({ positionsMin, positionsMax }, () => {
+      const initialPosition = minIndex * this.widthStep;
+      if (this.rangeAreaMinRef.current) {
+        this.rangeAreaMinRef.current.style.width = `${initialPosition}px`;
+      }
+      this.calculatePositionPullet();
+    });
   }
 
   resizeObserverNormal() {
@@ -163,6 +175,7 @@ export class Range extends Component<RangeProps, RangeState> {
       }
     }
   };
+
   onKeyDownHandler = (event: React.KeyboardEvent<HTMLInputElement>) => {
     if (event.key === "Enter") {
       const { name, value } = event.currentTarget;

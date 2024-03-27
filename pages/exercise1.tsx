@@ -38,7 +38,7 @@ const Exercise1 = () => {
           </span>
         </Link>
       </div>
-      <ul className="list-ranges space-y-4 max-w-4xl w-full">
+      <ul className="space-y-4 max-w-4xl w-full">
         {data.map((range) => (
           <li key={range.id} className="bg-white shadow-md rounded-lg p-4">
             <Range
@@ -49,6 +49,7 @@ const Exercise1 = () => {
               max={range.max}
               onChangeMin={onChangeMin}
               onChangeMax={onChangeMax}
+              exerciseType="exercise1"
             />
           </li>
         ))}

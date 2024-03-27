@@ -9,6 +9,7 @@ interface RangeProps {
   id: string;
   onChangeMin: (value: number, id: string) => void;
   onChangeMax: (value: number, id: string) => void;
+  exerciseType: "exercise1" | "exercise2";
 }
 
 const Range: React.FC<RangeProps> = ({
@@ -20,6 +21,7 @@ const Range: React.FC<RangeProps> = ({
   id,
   onChangeMin,
   onChangeMax,
+  exerciseType,
 }) => {
   const [minEditable, setMinEditable] = useState(false);
   const [maxEditable, setMaxEditable] = useState(false);
@@ -165,7 +167,11 @@ const Range: React.FC<RangeProps> = ({
         newValue = calculateMin(cursorPosition);
         onChangeMin(newValue, id);
       } else {
-        newValue = calculateMax(rangeRect.width - cursorPosition);
+        if (rangeValues && rangeValues.length > 1) {
+          newValue = calculateMax(cursorPosition);
+        } else {
+          newValue = calculateMax(rangeRect.width - cursorPosition);
+        }
         onChangeMax(newValue, id);
       }
 
@@ -229,8 +235,8 @@ const Range: React.FC<RangeProps> = ({
   );
 
   return (
-    <div className="range">
-      <div className="range__value range__value-min">
+    <div className="flex items-center">
+      <div className="w-28 pr-4">
         {minEditable ? (
           <input
             type="number"
@@ -239,45 +245,54 @@ const Range: React.FC<RangeProps> = ({
             defaultValue={min}
             onKeyDown={onKeyDownHandler}
             onBlur={() => setMinEditable(false)}
+            className="w-3/4 border-none border-b outline-none p-0 border border-gray-300 p-1"
           />
         ) : (
-          <span data-name="min" onClick={onClickLabelHandler}>
+          <span
+            data-name="min"
+            onClick={onClickLabelHandler}
+            className={`cursor-pointer border-b border-gray-300 ${
+              exerciseType === "exercise2"
+                ? "pointer-events-none border-transparent"
+                : "border border-gray-300 rounded p-1"
+            }`}
+          >
             {min} €
           </span>
         )}
       </div>
       <div
-        className="range__content"
+        className="flex items-center w-full h-6 mx-10 min-h-12"
         onMouseUp={onMouseUpHandler}
         onMouseLeave={onMouseUpHandler}
         onMouseMove={onMouseMoveHandler}
       >
-        <div className="range__line" ref={rangeLineRef}>
+        <div className="relative h-1 w-full bg-blue-800" ref={rangeLineRef}>
           <div
-            className="range__area range__area-min"
+            className="absolute top-0 h-full min-w-[20px] left-0 -mt-2"
             ref={rangeAreaMinRef}
             data-name="min"
           >
             <div
-              className="bullet bullet-min"
+              className="absolute w-5 h-5 bg-blue-800 rounded-full right-0 cursor-grab"
               data-type="min"
               onMouseDown={onMouseDownHandler}
             ></div>
           </div>
           <div
-            className="range__area range__area-max"
+            className="absolute top-0 h-full min-w-[20px] right-0 -mt-2"
             ref={rangeAreaMaxRef}
             data-name="max"
           >
             <div
-              className="bullet bullet-max"
+              className="absolute w-5 h-5 bg-blue-800 rounded-full left-0 cursor-grab"
               data-type="max"
               onMouseDown={onMouseDownHandler}
             ></div>
           </div>
         </div>
       </div>
-      <div className="range__value range__value-max">
+      <div className="w-28 pl-4 text-right">
         {maxEditable ? (
           <input
             type="number"
@@ -286,9 +301,18 @@ const Range: React.FC<RangeProps> = ({
             defaultValue={max}
             onKeyDown={onKeyDownHandler}
             onBlur={() => setMaxEditable(false)}
+            className="w-3/4 border-none border-b outline-none p-0"
           />
         ) : (
-          <span data-name="max" onClick={onClickLabelHandler}>
+          <span
+            data-name="max"
+            onClick={onClickLabelHandler}
+            className={`cursor-pointer border-b border-gray-300 ${
+              exerciseType === "exercise2"
+                ? "pointer-events-none border-transparent"
+                : "border border-gray-300 rounded p-1"
+            }`}
+          >
             {max} €
           </span>
         )}

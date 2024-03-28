@@ -246,10 +246,12 @@ const Range: React.FC<RangeProps> = ({
             onKeyDown={onKeyDownHandler}
             onBlur={() => setMinEditable(false)}
             className="w-3/4 border-none border-b outline-none p-0 border border-gray-300 p-1"
+            data-testid="min-input"
           />
         ) : (
           <span
             data-name="min"
+            data-testid="min-label"
             onClick={onClickLabelHandler}
             className={`cursor-pointer border-b border-gray-300 ${
               exerciseType === "exercise2"
@@ -267,7 +269,11 @@ const Range: React.FC<RangeProps> = ({
         onMouseLeave={onMouseUpHandler}
         onMouseMove={onMouseMoveHandler}
       >
-        <div className="relative h-1 w-full bg-blue-800" ref={rangeLineRef}>
+        <div
+          className="relative h-1 w-full bg-blue-800"
+          ref={rangeLineRef}
+          data-testid="range-line"
+        >
           <div
             className="absolute top-0 h-full min-w-[20px] left-0 -mt-2"
             ref={rangeAreaMinRef}
@@ -302,10 +308,12 @@ const Range: React.FC<RangeProps> = ({
             onKeyDown={onKeyDownHandler}
             onBlur={() => setMaxEditable(false)}
             className="w-3/4 border-none border-b outline-none p-0"
+            data-testid="max-input"
           />
         ) : (
           <span
             data-name="max"
+            data-testid="max-label"
             onClick={onClickLabelHandler}
             className={`cursor-pointer border-b border-gray-300 ${
               exerciseType === "exercise2"

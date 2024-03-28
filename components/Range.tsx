@@ -162,29 +162,28 @@ const Range: React.FC<RangeProps> = ({
         cursorPosition = rangeRect.width;
       }
 
-      let newValue;
       if (pulletToMoveRef.current === "min") {
-        newValue = calculateMin(cursorPosition);
+        let newValue = calculateMin(cursorPosition);
+        if (newValue >= max) {
+          newValue = max - 1;
+        }
         onChangeMin(newValue, id);
       } else {
+        let newValue;
         if (rangeValues && rangeValues.length > 1) {
           newValue = calculateMax(cursorPosition);
         } else {
           newValue = calculateMax(rangeRect.width - cursorPosition);
+        }
+        if (newValue <= min) {
+          newValue = min + 1;
         }
         onChangeMax(newValue, id);
       }
 
       calculatePositionPullet();
     },
-    [
-      calculateMin,
-      calculateMax,
-      onChangeMin,
-      onChangeMax,
-      id,
-      calculatePositionPullet,
-    ]
+    [calculateMin, calculateMax, onChangeMin, onChangeMax, id, min, max]
   );
 
   const onMouseUpHandler = useCallback(() => {
@@ -200,24 +199,19 @@ const Range: React.FC<RangeProps> = ({
 
       if (name === "min" && value < max && value >= minLimit) {
         onChangeMin(value, id);
-        setMinEditable(false);
       } else if (name === "max" && value > min && value <= maxLimit) {
         onChangeMax(value, id);
-        setMaxEditable(false);
+      } else {
+        alert(
+          "The value entered is not valid. Please adjust the value within the allowed range."
+        );
       }
 
+      setMinEditable(false);
+      setMaxEditable(false);
       calculatePositionPullet();
     },
-    [
-      min,
-      max,
-      minLimit,
-      maxLimit,
-      onChangeMin,
-      onChangeMax,
-      id,
-      calculatePositionPullet,
-    ]
+    [min, max, minLimit, maxLimit, onChangeMin, onChangeMax, id]
   );
 
   const onClickLabelHandler = useCallback(
